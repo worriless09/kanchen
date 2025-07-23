@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@dtjv/sm-2": "^2.1.0",
+    "@heroicons/react": "^2.2.0",
     "@kirklin/supermemo2": "^0.0.3",
     "@radix-ui/react-slot": "^1.2.3",
     "@sentry/nextjs": "^9.40.0",
