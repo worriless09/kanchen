@@ -61,7 +61,7 @@ export default function PaymentsButton({ planName, planPrice, planId }: Payments
   const [loading, setLoading] = useState(false);
 
   const createOrder = async (): Promise<OrderResponse> => {
-    const response = await fetch('/api/payment/create-order', {
+    const response = await fetch('/api/create-order', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

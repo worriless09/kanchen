@@ -10,7 +10,7 @@ const razorpay = new Razorpay({
 
 export async function POST(req: Request) {
   try {
-    const { amount, receipt, user_id, plan_type, email } = await req.json()
+    const { amount, receipt, user_id, planId, email } = await req.json()
 
     // Validate required fields
     if (!amount || !receipt) {
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
       receipt: String(receipt),
       notes: {
         user_id: String(user_id || ''),
-        plan_type: String(plan_type || ''),
+        plan_id: String(planId || ''),
         email: String(email || ''),
       },
     }
@@ -36,7 +36,8 @@ export async function POST(req: Request) {
     return NextResponse.json({
       orderId: order.id,
       amount: order.amount,
-      currency: order.currency
+      currency: order.currency,
+      keyId: process.env.RAZORPAY_KEY_ID! // Frontend needs this
     })
 
   } catch (error) {
