@@ -24,7 +24,8 @@ export default function DashboardStats() {
   })
   const [loading, setLoading] = useState(true)
   
-  const_supabase = createClientComponentClient()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const supabase = createClientComponentClient()
 
   useEffect(() => {
     fetchStats()
