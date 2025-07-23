@@ -49,5 +49,5 @@ module.exports = {
       },
     },
   },
-  plugins: [], // Empty plugins array
+  plugins: [],
 }

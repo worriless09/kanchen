@@ -52,5 +52,5 @@ module.exports = {
   plugins: [
     import('@tailwindcss/forms'),
     import('@tailwindcss/typography'),
-  ], // Empty plugins array
+  ],
 }

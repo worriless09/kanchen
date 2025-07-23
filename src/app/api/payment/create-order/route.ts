@@ -1,46 +1,58 @@
-import Razorpay from 'razorpay'
+// src/app/api/payment/create-order/route.ts
+
 import { NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import Razorpay from 'razorpay'
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
+  key_secret: process.env.RAZORPAY_SECRET!,
 })
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const { amount, currency = 'INR', planType } = await request.json()
-    
-    const supabase = createRouteHandlerClient({ cookies })
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
-    
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const { amount, receipt, user_id, plan_type, email } = await req.json()
+
+    // Validate required fields
+    if (!amount || !receipt) {
+      return NextResponse.json(
+        { error: 'Amount and receipt are required' }, 
+        { status: 400 }
+      )
     }
 
     const options = {
-      amount: amount * 100, // Razorpay expects amount in paise
-      currency,
-      receipt: `receipt_${Date.now()}`,
+      amount: Number(amount),
+      currency: 'INR' as const,
+      receipt: String(receipt),
       notes: {
-        user_id: user.id,
-        plan_type: planType,
-        email: user.email
-      }
+        user_id: String(user_id || ''),
+        plan_type: String(plan_type || ''),
+        email: String(email || ''),
+      },
     }
 
     const order = await razorpay.orders.create(options)
-    
+
     return NextResponse.json({
       orderId: order.id,
       amount: order.amount,
-      currency: order.currency,
-      keyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
+      currency: order.currency
     })
 
   } catch (error) {
-    console.error('Order creation failed:', error)
-    return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
+    console.error('Create order failed:', error)
+    
+    // Handle different types of errors
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: error.message }, 
+        { status: 500 }
+      )
+    }
+    
+    return NextResponse.json(
+      { error: 'Failed to create order' }, 
+      { status: 500 }
+    )
   }
 }
