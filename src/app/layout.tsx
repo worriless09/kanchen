@@ -1,22 +1,8 @@
-// app/layout.tsx or src/app/layout.tsx
-import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
-import "./globals.css";
+import { Inter } from 'next/font/google'
+import './globals.css'
+import { Analytics } from '@vercel/analytics/react'
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-})
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-})
-
-export const metadata: Metadata = {
-  title: "Kanchen Academy",
-  description: "An open-source spaced repetition app built with Supabase and Next.js",
-}
+const inter = Inter({ subsets: ['latin'] })
 
 export default function RootLayout({
   children,
@@ -24,9 +10,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="antialiased bg-background text-foreground">
+    <html lang="en">
+      <body className={inter.className}>
         {children}
+        <Analytics />
       </body>
     </html>
   )
