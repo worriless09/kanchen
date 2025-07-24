@@ -1,12 +1,12 @@
 // src/lib/supabase/client.ts
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { supabase } from '@supabase/auth-helpers-nextjs'
+import { createServerSupabase } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import type { Database } from '@/types/supabase'
 
-export const createClient = () => createClientComponentClient<Database>()
+export const createClient = () => supabase<Database>()
 
-export const createServerClient = () => createServerComponentClient<Database>({ cookies })
+export const createServerClient = () => createServerSupabase<Database>({ cookies })
 
 // Helper function to get user session
 export async function getSession() {

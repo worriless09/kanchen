@@ -1,4 +1,4 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createServerSupabase } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import DashboardStats from '@/components/DashboardStats'
@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
 export default async function Dashboard() {
-  const supabase = createServerComponentClient({ cookies })
+  const supabase = createServerSupabase({ cookies })
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {

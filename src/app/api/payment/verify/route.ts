@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { createServerSupabase } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import crypto from 'crypto'
 import { trackUserConversion } from '@/lib/analytics'
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
     }
 
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = createServerSupabase({ cookies })
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     
     if (userError || !user) {

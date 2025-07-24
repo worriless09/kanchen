@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { createClient } from '@/utils/supabase/client' // Updated import
+import { createClient } from '@/utils/supabase/browser'
+// Use supabase directly, no function call needed
 
 interface DashboardStats {
   dueToday: number
