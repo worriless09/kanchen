@@ -21,54 +21,38 @@ interface RazorpayResponse {
   razorpay_signature: string;
 }
 
-interface RazorpayOptions {
-  key: string;
-  amount: number;
-  currency: string;
-  name: string;
-  description: string;
-  order_id: string;
-  handler: (response: RazorpayResponse) => void;
-  prefill?: {
-    name?: string;
-    email?: string;
-    contact?: string;
+// Fixed: Add the missing 'close' method to match RazorpayInstance
+interface WindowWithRazorpay extends Window {
+  Razorpay: new (options: {
+    key: string;
+    amount: number;
+    currency: string;
+    name: string;
+    description: string;
+    order_id: string;
+    handler: (response: RazorpayResponse) => void;
+    prefill?: Record<string, string>;
+    theme?: Record<string, string>;
+    modal?: Record<string, () => void>;
+  }) => {
+    open: () => void;
+    close: () => void; // Add this missing method
   };
-  theme?: {
-    color?: string;
-  };
-  modal?: {
-    ondismiss?: () => void;
-  };
-}
-
-interface RazorpayInstance {
-  open: () => void;
-}
-
-interface RazorpayConstructor {
-  new (options: RazorpayOptions): RazorpayInstance;
-}
-
-// Extend Window interface to include Razorpay with proper typing
-declare global {
-  interface Window {
-    Razorpay: RazorpayConstructor;
-  }
 }
 
 export default function PaymentsButton({ planName, planPrice, planId }: PaymentsButtonProps) {
   const [loading, setLoading] = useState(false);
 
   const createOrder = async (): Promise<OrderResponse> => {
-    const response = await fetch('/api/create-order', {
+    const response = await fetch('/api/payment/create-order', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        amount: planPrice * 100, // Convert to paise
+        amount: planPrice * 100,
         planId: planId,
+        receipt: `receipt_${Date.now()}`,
       }),
     });
 
@@ -85,7 +69,7 @@ export default function PaymentsButton({ planName, planPrice, planId }: Payments
     try {
       const orderData = await createOrder();
 
-      const options: RazorpayOptions = {
+      const options = {
         key: orderData.keyId,
         amount: orderData.amount,
         currency: orderData.currency,
@@ -94,7 +78,6 @@ export default function PaymentsButton({ planName, planPrice, planId }: Payments
         order_id: orderData.orderId,
         handler: async (response: RazorpayResponse) => {
           try {
-            // Verify payment
             const verifyResponse = await fetch('/api/payment/verify-payment', {
               method: 'POST',
               headers: {
@@ -110,7 +93,6 @@ export default function PaymentsButton({ planName, planPrice, planId }: Payments
 
             if (verifyResponse.ok) {
               alert('Payment successful!');
-              // Redirect to success page or update UI
               window.location.href = '/dashboard?payment=success';
             } else {
               alert('Payment verification failed');
@@ -138,9 +120,8 @@ export default function PaymentsButton({ planName, planPrice, planId }: Payments
         },
       };
 
-      // Check if Razorpay is loaded
-      if (typeof window !== 'undefined' && window.Razorpay) {
-        const razorpay = new window.Razorpay(options);
+      if (typeof window !== 'undefined' && 'Razorpay' in window) {
+        const razorpay = new (window as WindowWithRazorpay).Razorpay(options);
         razorpay.open();
       } else {
         throw new Error('Razorpay SDK not loaded');
