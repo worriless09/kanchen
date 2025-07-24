@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/utils/supabase/client' // Updated import
 
 interface DashboardStats {
   dueToday: number
@@ -24,8 +24,9 @@ export default function DashboardStats() {
   })
   const [loading, setLoading] = useState(true)
   
+  // Updated client creation - no longer unused if you need it for auth
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const supabase = createClientComponentClient()
+  const supabase = createClient()
 
   useEffect(() => {
     fetchStats()
